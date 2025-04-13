@@ -17,35 +17,9 @@ type Product = {
     items: Product[];
   };
   
-  // Тип для запроса на получение списка товаров
-  type ProductRequest = {
-    method: 'GET';
-    header: any[];
-    url: {
-      raw: string;
-      host: string[];
-      path: string[];
-    };
-  };
-  
-  // Тип для ответа на запрос продукта, включая статус, заголовки и тело ответа
-  type ProductResponse = {
-    name: string;
-    originalRequest: ProductRequest;
-    status: string;
-    code: number;
-    _postman_previewlanguage: string;
-    header: {
-      key: string;
-      value: string;
-    }[];
-    cookie: any[];
-    body: string;
-  };
-  
   // Тип для тела запроса на создание заказа
   type OrderRequestBody = {
-    payment: 'online';
+    payment: 'online' | 'cash';
     email: string;
     phone: string;
     address: string;
