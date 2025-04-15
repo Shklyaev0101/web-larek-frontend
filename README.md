@@ -671,38 +671,38 @@ class WebLarekApi extends Api implements IShopAPI {
 ```
 
 ### Список событий
-Событие (eventName)	{Тип данных (data)}	Описание
-__1. События интерфейса (VIEW)__
-ui:show	{ element: HTMLElement }	Показать элемент на странице.
-ui:hide	{ element: HTMLElement }	Скрыть элемент на странице.
-ui:updateText	{ element: HTMLElement, text: string }	Обновить текстовое содержимое элемента.
-ui:toggleClass	{ element: HTMLElement, className: string, force?: boolean }	Переключить класс у элемента.
-ui:setImage	{ element: HTMLImageElement, src: string, alt?: string }	Установить изображение с альтернативным текстом.
-ui:setDisabled	{ element: HTMLElement, state: boolean }	Установить или снять блокировку с элемента.
-__2. События действий пользователя (USER ACTIONS)__
-user:addToCart	{ productId: string, quantity: number }	Пользователь добавил товар в корзину.
-user:removeFromCart	{ productId: string }	Пользователь удалил товар из корзины.
-user:checkout	{ cart: ICart }	Пользователь начал оформление заказа.
-user:selectPaymentMethod	`{ paymentMethod: 'online'	'cash' }`
-user:setShippingAddress	{ address: string }	Пользователь ввел адрес доставки.
-user:submitOrder	{ order: IOrder }	Пользователь подтвердил заказ.
-__3. События данных (MODEL)__
-model:catalogUpdated	{ catalog: ILot[] }	Обновление каталога товаров.
-model:cartUpdated	{ basket: string[] }	Обновление данных корзины.
-model:orderCreated	{ order: IOrderResponse }	Новый заказ был успешно размещен.
-model:orderFailed	{ error: string }	Произошла ошибка при оформлении заказа.
-model:previewChanged	`{ preview: string	null }`
-model:formErrorsChanged	{ formErrors: FormErrors }	Изменение ошибок в форме заказа.
-__4. Системные события__
-system:loading	{ isLoading: boolean }	Статус загрузки данных (загрузка/завершена).
-system:loaded	{ data: any }	Данные успешно загружены.
-system:error	{ message: string, code: number }	Произошла ошибка в приложении.
-system:formValidation	{ isValid: boolean, errors: FormErrors }	Результат валидации формы заказа.
-__5. События, связанные с моделью заказа (ORDER)__
-order:ready	{ order: IOrder }	Заказ готов к отправке (валидация формы успешна).
-order:submitted	{ order: IOrder }	Заказ был успешно отправлен.
-order:clear	{}	Очистить корзину после успешной оплаты.
+Событие (eventName)	{Тип данных (data)}	Описание<br>
+__1. События интерфейса (VIEW)__<br>
+ui:show	{ element: HTMLElement }	Показать элемент на странице.<br>
+ui:hide	{ element: HTMLElement }	Скрыть элемент на странице.<br>
+ui:updateText	{ element: HTMLElement, text: string }	Обновить текстовое содержимое элемента.<br>
+ui:toggleClass	{ element: HTMLElement, className: string, force?: boolean }	Переключить класс у элемента.<br>
+ui:setImage	{ element: HTMLImageElement, src: string, alt?: string }	Установить изображение с альтернативным текстом.<br>
+ui:setDisabled	{ element: HTMLElement, state: boolean }	Установить или снять блокировку с элемента.<br>
+__2. События действий пользователя (USER ACTIONS)__<br>
+user:addToCart	{ productId: string, quantity: number }	Пользователь добавил товар в корзину.<br>
+user:removeFromCart	{ productId: string }	Пользователь удалил товар из корзины.<br>
+user:checkout	{ cart: ICart }	Пользователь начал оформление заказа.<br>
+user:selectPaymentMethod	`{ paymentMethod: 'online'	'cash' }`<br>
+user:setShippingAddress	{ address: string }	Пользователь ввел адрес доставки.<br>
+user:submitOrder	{ order: IOrder }	Пользователь подтвердил заказ.<br>
+__3. События данных (MODEL)__<br>
+model:catalogUpdated	{ catalog: ILot[] }	Обновление каталога товаров.<br>
+model:cartUpdated	{ basket: string[] }	Обновление данных корзины.<br>
+model:orderCreated	{ order: IOrderResponse }	Новый заказ был успешно размещен.<br>
+model:orderFailed	{ error: string }	Произошла ошибка при оформлении заказа.<br>
+model:previewChanged	`{ preview: string	null }`<br>
+model:formErrorsChanged	{ formErrors: FormErrors }	Изменение ошибок в форме заказа.<br>
+__4. Системные события__<br>
+system:loading	{ isLoading: boolean }	Статус загрузки данных (загрузка/завершена).<br>
+system:loaded	{ data: any }	Данные успешно загружены.<br>
+system:error	{ message: string, code: number }	Произошла ошибка в приложении.<br>
+system:formValidation	{ isValid: boolean, errors: FormErrors }	Результат валидации формы заказа.<br>
+__5. События, связанные с моделью заказа (ORDER)__<br>
+order:ready	{ order: IOrder }	Заказ готов к отправке (валидация формы успешна).<br>
+order:submitted	{ order: IOrder }	Заказ был успешно отправлен.<br>
+order:clear	{}	Очистить корзину после успешной оплаты.<br>
 __6. События для компонентов (COMPONENTS)__
-component:rendered	{ component: string }	Компонент был отрисован на странице.
-component:updated	{ component: string, data: any }	Компонент был обновлен с новыми данными.
-component:destroyed	{ component: string }	Компонент был удален или уничтожен.
+component:rendered	{ component: string }	Компонент был отрисован на странице.<br>
+component:updated	{ component: string, data: any }	Компонент был обновлен с новыми данными.<br>
+component:destroyed	{ component: string }	Компонент был удален или уничтожен.<br>
