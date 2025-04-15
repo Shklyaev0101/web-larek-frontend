@@ -58,7 +58,7 @@ yarn build
 
 ## Типы данных
 
-<pre>```ts
+```TypeScript
 type Product = {
     id: string;
     description: string;
@@ -85,7 +85,7 @@ type OrderResponse = {
 type FormData = Omit<Order, 'total' | 'items'>;
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
-```</pre>
+```
 
 ## Архитектура
 Проект построен на основе архитектуры MVP (Model-View-Presenter):
@@ -134,7 +134,7 @@ type FormErrors = Partial<Record<keyof FormData, string>>;
 __Описание класса:__
 Базовый класс для всех компонентов VIEW (Отображение).
 Класс стандартизирует механизм отрисовки элементов интерфейса и управления их состоянием. 
-<pre>```ts
+```TypeScript
   abstract class Component<T> {
     //Свойства:
     protected readonly container: HTMLElement // Корневой DOM-элемент
@@ -151,7 +151,7 @@ __Описание класса:__
     protected setImage(element: HTMLImageElement, src: string, alt?: string) // Установить изображение с альтернативным текстом
     render(data?: Partial<T>): HTMLElement // Вернуть корневой DOM-элемент   
     }
-```</pre>
+```
 
 ### Внешний компонент
 
@@ -160,7 +160,7 @@ __Описание класса:__
 Брокер событий, классическая реализация
 В расширенных вариантах есть возможность подписаться на все события или слушать события по шаблону например.
 
-<pre>```ts
+```TypeScript
 interface IEvents {
     on<T extends object>(event: EventName, callback: (data: T) => void): void;
     emit<T extends object>(event: string, data?: T): void;
@@ -181,7 +181,7 @@ class EventEmitter implements IEvents {
     offAll() // Сбросить все обработчики
     trigger<T extends object>(eventName: string, context?: Partial<T>) // Сделать коллбек триггер, генерирующий событие при вызове
 }
-```</pre>
+```
 
 ### Классы модели (MODEL)
 
@@ -191,7 +191,7 @@ __Описание класса:__
 Обеспечивает поддержку товаров в каталоге, корзину покупок, оформление заказов, а также предварительный просмотр товаров. 
 Отвечает за взаимодействие с состоянием проекта, обработку ошибок и валидацию данных.
 
-<pre>```ts
+```TypeScript
 interface IAppState {
     basket: string[];          // Массив товаров в корзине
     catalog: LotItem[];        // Массив товаров в каталоге
@@ -273,7 +273,7 @@ class AppState extends Model<IAppState> {
         return Object.keys(errors).length === 0;  // Возвращаем true, если нет ошибок
     }
 }
-```</pre>
+```
 
 ### Классы отображения (VIEW)
 
@@ -282,7 +282,7 @@ __Описание класса:__
 Дает возможность отображать товары в магазине.
 Позволяет динамически обновлять данные о товарах (цена, описание, наличие).
 
-<pre>```ts
+```TypeScript
 interface ICard<T> {
     title: string;
     description?: string | string[];
@@ -340,7 +340,7 @@ class Card<T> extends Component<ICard<T>> {
         this.setText(this._price, `$${value}`);
     }
 }
-```</pre>
+```
 
 **class Basket**
 __Описание класса:__
@@ -348,7 +348,7 @@ __Описание класса:__
 Класс управляет интерфейсом корзины: он показывает список товаров, считает итоговую сумму и включает/выключает кнопку оформления заказа в зависимости от содержимого. 
 Использует систему событий для связи с другими частями приложения.
 
-<pre>```ts
+```TypeScript
 interface IBasketView {
     items: HTMLElement[];
     total: number;
@@ -390,7 +390,7 @@ class Basket extends Component<IBasketView> {
     this.setText(this._total, formatNumber(total));
   }
 }
-```</pre>
+```
 
 **class Form<T>**
 __Описание класса:__
@@ -400,7 +400,7 @@ __Описание класса:__
 Синхронизирует состояние формы с проектом.
 Использует единый шаблон для форм с различной структурой данных.
 
-<pre>```ts
+```TypeScript
 interface IFormState {
     valid: boolean;
     errors: string[];
@@ -451,7 +451,7 @@ class Form<T> extends Component<IFormState> {
     return this.container;
   }
 }
-```</pre>
+```
 
 **class Modal**
 __Описание класса:__
@@ -461,7 +461,7 @@ __Описание класса:__
 Подключается к системе событий (EventEmitter).
 Подходит для переиспользования с любым HTML-контентом.
 
-<pre>```ts
+```TypeScript
 interface IModalData {
     content: HTMLElement;
 }
@@ -502,7 +502,7 @@ class Modal extends Component<IModalData> {
     return this.container;
   }
 }
-```</pre>
+```
 
 **class Success**
 __Описание класса:__
@@ -510,7 +510,8 @@ __Описание класса:__
 Обрабатывает отображение экрана успешного действия (например, "Спасибо за заказ").
 Позволяет назначить колбэк при клике по кнопке.
 Является частью архитектуры компонентов, основанной на наследовании от Component.
-<pre>```ts
+
+```TypeScript
 interface ISuccess {
     total: number;
 }
@@ -531,14 +532,14 @@ class Success extends Component<ISuccess> {
     }
   }
 }
-```</pre>
+```
 
 **class Page**
 __Описание класса:__
 Управляет элементами страницы, которые отвечают за отображение данных (корзина, каталог товаров, блокировка страницы).
 Использует метод событий для обработки взаимодействий с корзиной, обновляет DOM при изменении данных и предоставляет методы для изменения визуальных состояний, таких как блокировка страницы.
 
-<pre>```ts
+```TypeScript
 interface IPage {
     counter: number;
     catalog: HTMLElement[];
@@ -578,14 +579,14 @@ class Page extends Component<IPage> {
         }
     }
 }
-```</pre>
+```
 
 **class Order**
 __Описание класса:__
 Представляет собой компонент формы оформления заказа в магазине Веб-Ларёк. 
 Наследует базовый функционал от класса Form, обрабатывая ввод данных покупателя (телефон и email), и обеспечивает их установку в соответствующие поля формы.
 
-<pre>```ts
+```TypeScript
 class Order extends Form<IOrderForm> {
   //Свойства:
   protected container: HTMLFormElement; // Контейнер формы, полученный через родительский конструктор
@@ -602,7 +603,7 @@ class Order extends Form<IOrderForm> {
   (this.container.elements.namedItem('email') as HTMLInputElement).value = email;
   }
 }
-```</pre>
+```
 
 ### Сервисный класс
 
@@ -611,7 +612,7 @@ __Описание класса:__
 Api-клиент для взаимодействия с серверной частью проекта.
 Предоставляет удобный и типизированный способ получения данных о товарах, получения информации о конкретном товаре, а также оформления заказа.
 
-<pre>```ts
+```TypeScript
 interface IShopAPI {
     getProductList: () => Promise<IProduct[]>;             // Получить список всех товаров
     getProductItem: (id: string) => Promise<IProduct>;     // Получить данные одного товара
@@ -667,7 +668,7 @@ class WebLarekApi extends Api implements IShopAPI {
         return this.post('/order', order);
     }
 }
-```</pre>
+```
 
 ### Список событий
 Событие (eventName)	{Тип данных (data)}	Описание
