@@ -18,7 +18,7 @@ type Product = {
   };
   
   // Тип для тела запроса на создание заказа
-  type OrderRequestBody = {
+  type Order = {
     payment: 'online' | 'cash';
     email: string;
     phone: string;
@@ -32,49 +32,9 @@ type Product = {
     id: string;
     total: number;
   };
-  
-  // Тип для запроса на создание заказа
-  type OrderRequest = {
-    method: 'POST';
-    header: any[];
-    body: {
-      mode: 'raw';
-      raw: string;
-      options: {
-        raw: {
-          language: 'json';
-        };
-      };
-    };
-    url: {
-      raw: string;
-      host: string[];
-      path: string[];
-    };
-  };
-  
-  // Тип для деталей ответа, например, ошибок или успешных сообщений
-  type OrderResponseDetail = {
-    name: string;
-    originalRequest: OrderRequest;
-    status: string;
-    code: number;
-    _postman_previewlanguage: string;
-    header: {
-      key: string;
-      value: string;
-    }[];
-    cookie: any[];
-    body: string;
-  };
-  
-  // Тип для запроса на получение информации о конкретном товаре
-  type ProductItemRequest = {
-    method: 'GET';
-    header: any[];
-    url: {
-      raw: string;
-      host: string[];
-      path: string[];
-    };
-  };
+
+  // Тип данных формы (без total и items)
+  type Form = Omit<Order, 'total' | 'items'>;
+
+  // Тип ошибок формы
+  type FormErrors = Partial<Record<keyof FormData, string>>;
