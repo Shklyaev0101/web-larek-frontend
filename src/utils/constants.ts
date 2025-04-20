@@ -1,47 +1,43 @@
+import { CategoryConfig } from '../types';
+
 export const API_URL = `${process.env.API_ORIGIN}/api/weblarek`;
 export const CDN_URL = `${process.env.API_ORIGIN}/content/weblarek`;
 
-export const CATEGORY_CONFIG = {
-    'other': { label: '', color: '' },
-    // Добавляем другие категории товаров (при необходимости)
-  };
-  
-  // Сообщения об ошибках в формах при оформлении заказа
-  export const FORM_ERRORS = {
-    required: 'Это поле обязательно для заполнения.',
-    email: 'Введите правильный адрес электронной почты.',
-    phone: 'Введите правильный номер телефона.',
-    address: 'Введите ваш адрес для доставки.',
-    minLength: (min: number) => `Минимальная длина поля ${min} символов.`,
-    maxLength: (max: number) => `Максимальная длина поля ${max} символов.`,
-    // Добавляем другие типы ошибок (при необходимости)
-  };
-  
-  // Конфигурация API магазина (например, таймауты, лимиты)
-  export const API_SETTINGS = {
-    timeout: 5000, // Таймаут запроса в миллисекундах
-    retryLimit: 3, // Количество попыток при неудачном запросе
-    // Добавляем другие настройки для API
-  };
-  
-  // Константы для работы с корзиной
-  export const BASKET_CONFIG = {
-    maxItems: 50, // Максимальное количество товаров в корзине
-    emptyMessage: 'Корзина пуста. Добавьте товары для оформления заказа.', // Сообщение, когда корзина пуста
-    // Можно добавить другие настройки корзины
-  };
-  
-  // Константы для стилей
-  export const STYLES = {
-    buttonColor: '#FFFFFF', // Цвет кнопки (например, для добавления в корзину)
-    backgroundColor: '#0E2037', // Цвет фона на главной странице
-    headerBackgroundColor: '#060C14', // Цвет фона для шапки сайта
-    // Добавляем другие стили для элементов на странице (при необходимости)
-  };
-  
-  // Константы для сообщений об успешном заказе
-  export const SUCCESS_MESSAGES = {
-    orderSuccess: 'Заказ оформлен',
-    orderFailure: 'Произошла ошибка при оформлении заказа. Попробуйте снова.',
-    // Добавляем другие сообщения о статусах заказа (при необходимости)
-  };
+export const CATEGORY_CONFIG: CategoryConfig = {
+	soft: {
+		label: 'софт-скил', // или подходящий текст для категории
+		color: '#F0F0F0', // значение цвета из $category1 в SCSS
+	},
+	hard: {
+		label: 'хард-скил',
+		color: '#A0A0A0', // значение цвета из $category5 в SCSS
+	},
+	other: {
+		label: 'другое',
+		color: '#D0D0D0', // значение цвета из $category2 в SCSS
+	},
+	additional: {
+		label: 'дополнительное',
+		color: '#C0C0C0', // значение цвета из $category3 в SCSS
+	},
+	button: {
+		label: 'кнопка',
+		color: '#B0B0B0', // значение цвета из $category4 в SCSS
+	},
+};
+
+// Сообщения об ошибках в формах при оформлении заказа
+export interface IFormErrors {
+	email?: string;
+	phone?: string;
+	address?: string;
+	[key: string]: string | undefined; // Поддержка динамических ошибок
+}
+
+export const FORM_ERRORS: IFormErrors = {
+	required: 'Это поле обязательно для заполнения.',
+	email: 'Введите правильный адрес электронной почты.',
+	phone: 'Номер телефона должен быть в формате: +7 (XXX) XXX-XX-XX',
+	address: 'Введите ваш адрес для доставки.',
+	// Добавляем другие типы ошибок (при необходимости)
+};

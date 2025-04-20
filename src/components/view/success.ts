@@ -4,8 +4,8 @@ export interface ISuccessActions {
 	onClick: () => void;
 }
 export interface ISuccess {
-    total: number;
-  }
+	total: number;
+}
 
 export class Success extends Component<ISuccess> {
 	private _close: HTMLButtonElement;
@@ -16,8 +16,12 @@ export class Success extends Component<ISuccess> {
 		super('success'); // Используем id шаблона <template id="success">
 		this.actions = actions;
 
-		this._close = this.container.querySelector('.order-success__close') as HTMLButtonElement;
-		this._description = this.container.querySelector('.order-success__description') as HTMLElement;
+		this._close = this.container.querySelector(
+			'.order-success__close'
+		) as HTMLButtonElement;
+		this._description = this.container.querySelector(
+			'.order-success__description'
+		) as HTMLElement;
 
 		if (this._close) {
 			this._close.addEventListener('click', () => {

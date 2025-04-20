@@ -1,5 +1,4 @@
-// components/common/WebLarekApi.ts
-import { Api, ApiListResponse } from './api';
+import { Api, ApiListResponse } from '../base/api';
 import { IProduct, IOrder, IOrderResult } from '../../types';
 
 // Интерфейс взаимодействия с API магазина
@@ -20,8 +19,9 @@ export class WebLarekApi extends Api implements IShopAPI {
 
 	// Получить список всех товаров
 	getProductList(): Promise<IProduct[]> {
-		return this.get('/product')
-			.then((data) => (data as ApiListResponse<IProduct>).items);
+		return this.get('/product').then(
+			(data) => (data as ApiListResponse<IProduct>).items
+		);
 	}
 
 	// Получить подробную информацию о товаре
