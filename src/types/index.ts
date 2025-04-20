@@ -1,7 +1,16 @@
 // Типы для каждого элемента
 
+// Тип для состояния приложения
+export type IAppState = {
+  basket: string[];  // Массив ID товаров в корзине
+  catalog: IProductListResponse[]; // Массив товаров в каталоге
+  order: IOrder;  // Заказ пользователя
+  preview: string | null;  // Предварительный просмотр товара
+  formErrors: IFormErrors;  // Ошибки формы
+};
+
 // Тип для товара
-type Product = {
+export type IProduct = {
     id: string;
     description: string;
     image: string;
@@ -12,13 +21,13 @@ type Product = {
   
   // Тип для ответа на запрос списка продуктов, 
   // который включает общее количество товаров и массив товаров
-  type ProductListResponse = {
+  export type IProductListResponse = {
     total: number;
-    items: Product[];
+    items: IProduct[];
   };
   
   // Тип для тела запроса на создание заказа
-  type Order = {
+  export type IOrder = {
     payment: 'online' | 'cash';
     email: string;
     phone: string;
@@ -28,13 +37,13 @@ type Product = {
   };
   
   // Тип для ответа на запрос создания заказа
-  type OrderResponse = {
+  export type IOrderResult = {
     id: string;
     total: number;
   };
 
   // Тип данных формы (без total и items)
-  type Form = Omit<Order, 'total' | 'items'>;
+  export type IOrderForm = Omit<IOrder, 'total' | 'items'>;
 
   // Тип ошибок формы
-  type FormErrors = Partial<Record<keyof FormData, string>>;
+  export type IFormErrors = Partial<Record<keyof FormData, string>>;
