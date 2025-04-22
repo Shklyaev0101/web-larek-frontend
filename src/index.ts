@@ -5,10 +5,10 @@ import { EventEmitter } from './components/base/events';
 import { AppState } from './components/model/appState';
 
 import { Page } from './components/view/page';
-import { Modal } from './components/view/modal';
 import { Card } from './components/view/card';
 import { Basket } from './components/view/basket';
 import { Order } from './components/view/order';
+import { Modal } from './components/view/modal';
 import { Success } from './components/view/success';
 import { Form } from './components/view/form';
 
@@ -18,27 +18,26 @@ import {
 	CATEGORY_CONFIG,
 	FORM_ERRORS,
 } from './utils/constants';
-import { cloneTemplate } from './utils/utils';
+import { cloneTemplate, ensureElement } from './utils/utils';
 
-import { IAppState, IProduct, IProductListResponse } from './types';
+import { IAppState, IOrderForm, IProduct, IProductListResponse } from './types';
 
 // Инициализация зависимостей
 const events = new EventEmitter();
-const api = new WebLarekApi(API_URL, CDN_URL);
+const api = new WebLarekApi(CDN_URL, API_URL);
 const appState = new AppState(events);
 
 // Инициализация UI - компонентов
 const page = new Page(document.body, events);
-const modal = new Modal(events);
-document
-	.querySelector('#modal-container')
-	?.appendChild(modal.render({ content: document.createElement('div') }));
-const basket = new Basket(
-	document.querySelector('#basket') as HTMLElement,
-	events
-);
-const orderForm = new Order(events);
-const success = new Success({
+
+let modal: Modal;
+document.addEventListener('DOMContentLoaded', () => {
+	modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
+});
+
+const basket = new Basket(ensureElement<HTMLElement>('#basket'), events);
+const orderForm = new Order(ensureElement<HTMLFormElement>('#order'), events);
+const success = new Success(ensureElement<HTMLElement>('#success'), {
 	onClick: () => modal.close(),
 });
 
@@ -50,15 +49,17 @@ api.getProductList().then((response) => {
 // Обновление каталога
 events.on('state:changed', () => {
 	const catalogItems = appState.catalog.map((product) => {
-		const card = new Card('card', cloneTemplate('#card-template'), events, {
+		const card = new Card(cloneTemplate('#card-catalog'), events, {
 			buttonText: 'Добавить в карточку',
 			onClick: () => {
 				appState.setPreview(product);
+				// Открываем модалку только при клике на карточку товара
+				events.emit('modal:open');
 			},
 		});
 
 		card.title = product.title;
-		card.image = CDN_URL + product.image;
+		card.image = product.image;
 		card.price = product.price ?? 0;
 
 		return card.render(); // Рендерим карточку товара
@@ -73,11 +74,10 @@ events.on('preview:changed', () => {
 	if (!product) return;
 
 	const card = new Card<'available' | 'out of stock'>(
-		'card',
-		cloneTemplate('#preview-template'),
+		cloneTemplate('#card-preview'),
 		events,
 		{
-			buttonText: 'Добавить в корзину',
+			buttonText: 'В корзину',
 			onClick: () => {
 				appState.toggleOrderedLot(
 					product.id,
@@ -89,13 +89,15 @@ events.on('preview:changed', () => {
 
 	// Устанавливаем данные для предпросмотра
 	card.title = product.title;
-	card.image = CDN_URL + product.image;
+	card.image = product.image;
 	card.price = product.price ?? 0;
 	card.description = product.description;
 
 	// Открываем модальное окно с предпросмотром товара
 	modal.content = card.render();
-	modal.open();
+	
+	//events.emit('modal:open');
+	//modal.open();
 });
 
 // Обновление корзины
@@ -105,18 +107,17 @@ events.on('basket:changed', () => {
 		if (!product) return document.createElement('div');
 
 		const card = new Card<'available' | 'out of stock'>(
-			'card',
-			cloneTemplate('#card-small-template'),
+			cloneTemplate('#card-basket'),
 			events,
 			{
-				buttonText: 'Удалить из корзины',
+				buttonText: 'Удалить',
 				onClick: () => appState.toggleOrderedLot(id, false),
 			}
 		);
 
 		// Устанавливаем данные товара в карточке
 		card.title = product.title;
-		card.image = CDN_URL + product.image;
+		card.image = product.image;
 		card.price = product.price ?? 0;
 
 		return card.render(); // Рендерим карточку товара
@@ -130,7 +131,8 @@ events.on('basket:changed', () => {
 });
 
 // Работа с формой (Form)
-events.on('form:change', ({ field, value }) => {
+events.on('form:change', (data: { field: keyof IOrderForm; value: string }) => {
+	const { field, value } = data;
 	appState.setOrderField(field, value);
 	orderForm.valid = appState.validateOrder(); // Проверка валидности формы
 });
@@ -156,5 +158,6 @@ events.on('form:submit', () => {
 			page.locked = false;
 			orderForm.errors = 'Ошибка при отправке заказа.'; // Ошибка при отправке
 			console.error(err);
-		});
+		});	
+
 });

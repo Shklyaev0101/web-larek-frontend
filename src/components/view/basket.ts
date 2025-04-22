@@ -9,13 +9,13 @@ interface IBasketView {
 }
 
 export class Basket extends Component<IBasketView> {
-	// Элементы DOM для отображения списка товаров, суммы и кнопки
+	// Элементы DOM для отображения списка товаров, суммы, кнопки
 	protected _list: HTMLElement;
 	protected _total: HTMLElement;
 	protected _button: HTMLElement;
 
 	constructor(container: HTMLElement, protected events: EventEmitter) {
-		super('basket-template'); // Используем шаблон корзины для рендеринга компонента
+		super(container);
 
 		// Инициализация элементов, связанных с корзиной
 		this._list = container.querySelector('.basket-items')!;

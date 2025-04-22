@@ -7,13 +7,14 @@ interface IFormState {
 	errors: string[];
 }
 
-export class Form<T> extends Component<IFormState> {
+export class Form<T extends Record<string, any>> extends Component<IFormState> {
 	// DOM элементы для формы
 	protected _submit: HTMLButtonElement; // Кнопка отправки
 	protected _errors: HTMLElement; // Элемент для отображения ошибок
+	protected _fields: Partial<Record<keyof T, HTMLInputElement>> = {};
 
-	constructor(container: HTMLFormElement, events: EventEmitter) {
-		super('form-template'); // Вызов конструктора родительского класса с ID шаблона
+	constructor(container: HTMLFormElement, protected events: EventEmitter) {
+		super(container);
 
 		// Привязываем необходимые элементы DOM
 		this._submit = container.querySelector(
@@ -21,17 +22,19 @@ export class Form<T> extends Component<IFormState> {
 		) as HTMLButtonElement;
 		this._errors = container.querySelector('.form-errors') as HTMLElement;
 
+		const inputs = container.querySelectorAll<HTMLInputElement>('input[name]');
+		inputs.forEach((input) => {
+			const name = input.name as keyof T;
+			this._fields[name] = input;
+		});
+
 		// Слушаем изменения в форме
 		this.container.addEventListener('input', (event) => {
 			const target = event.target as HTMLInputElement;
 			if (target.name) {
 				this.onInputChange(target.name as keyof IOrderForm, target.value);
+				this.errors = ''; // Очищаем ошибки при изменении полей
 			}
-		});
-
-		// Скрываем ошибки при изменении значения в любом поле
-		this.container.addEventListener('input', () => {
-			this.errors = ''; // Очищаем ошибки при изменении полей
 		});
 	}
 
@@ -66,13 +69,10 @@ export class Form<T> extends Component<IFormState> {
 	 */
 	render(state: Partial<T> & IFormState): HTMLFormElement {
 		// Для каждого поля из состояния устанавливаем соответствующие значения
-		Object.keys(state).forEach((key) => {
-			const field = this.container.querySelector(
-				`[name="${key}"]`
-			) as HTMLInputElement;
-			if (field) {
-				const typedKey = key as keyof T;
-				field.value = String(state[typedKey]);
+		Object.entries(state).forEach(([key, value]) => {
+			const typedKey = key as keyof T;
+			if (this._fields[typedKey]) {
+				this._fields[typedKey]!.value = String(value ?? '');
 			}
 		});
 

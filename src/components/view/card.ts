@@ -20,26 +20,22 @@ export class Card<T> extends Component<ICard<T>> {
 	 * Конструктор класса
 	 */
 	constructor(
-		templateId: string,
 		container: HTMLElement,
 		protected events: EventEmitter,
 		actions?: { buttonText: string; onClick: () => void }
 	) {
-		super(templateId); // Инициализация базового компонента
+		super(container);
 
 		// Инициализация элементов DOM
-		this._title = this.container.querySelector('.product-title') as HTMLElement;
-		this._price = this.container.querySelector('.product-price') as HTMLElement;
-
-		// Изображение товара
+		this._title = this.container.querySelector('.card__title') as HTMLElement;
+		this._price = this.container.querySelector('.card__price') as HTMLElement;
 		this._image = this.container.querySelector(
-			'.product-image'
+			'.card__image'
 		) as HTMLImageElement;
-
-		if (actions) {
-			this._button = this.container.querySelector(
-				'.product-button'
-			) as HTMLButtonElement;
+		this._button = this.container.querySelector(
+			'.card__button'
+		) as HTMLButtonElement;
+		if (this._button) {
 			this._button.textContent = actions.buttonText;
 			this._button.addEventListener('click', actions.onClick);
 		}
@@ -75,17 +71,12 @@ export class Card<T> extends Component<ICard<T>> {
 		if (!this._description) {
 			this._description = document.createElement('p');
 			this._description.classList.add('product-description');
-			this.setText(
-				this._description,
-				Array.isArray(value) ? value.join(' ') : value
-			);
 			this.container.appendChild(this._description);
-		} else {
-			this.setText(
-				this._description,
-				Array.isArray(value) ? value.join(' ') : value
-			);
 		}
+		this.setText(
+			this._description,
+			Array.isArray(value) ? value.join(' ') : value
+		);
 	}
 
 	/**
@@ -102,10 +93,10 @@ export class Card<T> extends Component<ICard<T>> {
 		if (this._button) {
 			if (value === 'available') {
 				this.setDisabled(this._button, false);
-				this._button.textContent = 'Add to Cart';
+				this._button.textContent = 'Добавлен в корзину';
 			} else if (value === 'out of stock') {
 				this.setDisabled(this._button, true);
-				this._button.textContent = 'Out of Stock';
+				this._button.textContent = 'Нет в наличии';
 			}
 		}
 	}
@@ -116,7 +107,7 @@ export class Card<T> extends Component<ICard<T>> {
 	updateCard(cardData: ICard<T>) {
 		this.title = cardData.title;
 		this.image = cardData.image;
-		this.description = cardData.description || 'No description available';
+		this.description = cardData.description || 'Описание отсутствует';
 		this.price = cardData.price;
 		this.status = cardData.status;
 	}

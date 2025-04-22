@@ -3,11 +3,13 @@
 Стек: HTML, SCSS, TS, Webpack
 
 Структура проекта:
+
 - src/ — исходные файлы проекта
 - src/components/ — папка с JS компонентами
 - src/components/base/ — папка с базовым кодом
 
 Важные файлы:
+
 - src/pages/index.html — HTML-файл главной страницы
 - src/types/index.ts — файл с типами
 - src/index.ts — точка входа приложения
@@ -16,6 +18,7 @@
 - src/utils/utils.ts — файл с утилитами
 
 ## Установка и запуск
+
 Для установки и запуска проекта необходимо выполнить команды
 
 ```
@@ -29,6 +32,7 @@ npm run start
 yarn
 yarn start
 ```
+
 ## Сборка
 
 ```
@@ -44,14 +48,17 @@ yarn build
 # Документация проекта
 
 ## Краткое описание проекта "Веб-ларек"
+
 Создание интернет магазина с товарами для веб-разработчиков - "Web-ларек",
 с просмотром каталога товаров, добавления товаров в корзину и с возможностью сделать заказ.
 
 Шаг 1:
+
 - Выбор способа оплаты и ввод адреса.
 - Если данные не введены, появляется ошибка.
 
 Шаг 2:
+
 - Ввод почты и телефона.
 - Если одно из полей пустое, появляется ошибка.
 - При успешной оплате корзина очищается.
@@ -88,25 +95,31 @@ type FormErrors = Partial<Record<keyof FormData, string>>;
 ```
 
 ## Архитектура
+
 Проект построен на основе архитектуры MVP (Model-View-Presenter):
-- Model (Модель) - модель содержащая данные приложения и бизнес-логику. 
+
+- Model (Модель) - модель содержащая данные приложения и бизнес-логику.
 - View (Представление) - представление, ответственное за отображение данных пользователю.
 - Presenter (Презентер) - координирует взаимодействие между моделью и представлением.
 
 ## Основные части/слои и их функции
+
 **Базовые классы**
+
 - Component,
 - EventEmitter,
 - Api,
 - WebLarekApi.
 
 **Model (Модель)**
+
 - AppState.
 
 **View (Представление)**
 Компоненты интерфейса:
+
 - Card.
-- Basket, 
+- Basket,
 - Form,
 - Order,
 - Modal,
@@ -114,22 +127,24 @@ type FormErrors = Partial<Record<keyof FormData, string>>;
 - Page.
 
 **Presenter (Презентер)**
+
 - Необходим для обработки взаимодействия между View и Model (реализация через EventEmitter).
   Реализован в корневом index.ts.
 
 ## Взаимодействие частей/слоев
-1) Пользователь взаимодействует с компонентами интерфейса View (Представление).
-2) Компонент вызывает событие через EventEmitter.
-3) Presenter (Презентер) обрабатывает событие, запрашивает данные у Model (Модель).
-4) Model (Модель) возвращает данные.
-5) Presenter (Презентер) передаёт данные обратно в View (Представление), которое обновляется через методы.
+
+1. Пользователь взаимодействует с компонентами интерфейса View (Представление).
+2. Компонент вызывает событие через EventEmitter.
+3. Presenter (Презентер) обрабатывает событие, запрашивает данные у Model (Модель).
+4. Model (Модель) возвращает данные.
+5. Presenter (Презентер) передаёт данные обратно в View (Представление), которое обновляется через методы.
 
 ## Описание классов
 
 ### Базовые классы
 
 **abstract class Component<T>**<br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Базовый класс для всех компонентов VIEW (Отображение).<br>
 Класс стандартизирует механизм отрисовки элементов интерфейса и управления их состоянием.
 
@@ -150,7 +165,7 @@ __Описание класса:__<br>
 ```
 
 **class EventEmitter** implements IEvents<br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Брокер событий, классическая реализация<br>
 В расширенных вариантах есть возможность подписаться на все события или слушать события по шаблону например.
 
@@ -172,7 +187,7 @@ interface IEvents {
 ```
 
 **class Api**<br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Выполняет HTTP- запросы к API.
 Устанавливает общие заголовки и параметры запроса.
 Выполняет централизованную обработку успешных и шибочных ответов.
@@ -190,7 +205,7 @@ __Описание класса:__<br>
 ```
 
 **class WebLarekApi** extends Api implements IShopAPI<br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Api-клиент для взаимодействия с серверной частью проекта.<br>
 Предоставляет удобный и типизированный способ получения данных о товарах, получения информации о конкретном товаре, а также оформления заказа.
 
@@ -213,7 +228,7 @@ interface IShopAPI {
 ### Классы модели (MODEL)
 
 **class AppState** extends Model<IAppState><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Управляет состоянием проекта.<br>
 Обеспечивает поддержку товаров в каталоге, корзину покупок, оформление заказов, а также предварительный просмотр товаров.<br>
 Отвечает за взаимодействие с состоянием проекта, обработку ошибок и валидацию данных.
@@ -247,7 +262,7 @@ interface IAppState {
 ### Классы представления / отображения (VIEW)
 
 **class Card<T>** extends Component<ICard<T>><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Дает возможность отображать товары в магазине.<br>
 Позволяет динамически обновлять данные о товарах (цена, описание, наличие).
 
@@ -276,7 +291,7 @@ interface ICard<T> {
 ```
 
 **class Basket** extends Component<IBasketView><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Это часть слоя MODEL (модель).<br>
 Класс отвечает за отображение содержимого корзины: выводит список товаров, итоговую сумму и управляет доступностью кнопки оформления заказа.<br>
 Не содержит бизнес-логики — все данные передаются извне (например, из модели).<br>
@@ -301,7 +316,7 @@ interface IBasketView {
 ```
 
 **class Form<T>**extends Component<IFormState><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Это часть слоя VIEW (отображение).<br>
 Инкапсулирует логику ввода и отправки данных.<br>
 Отслеживает изменения каждого поля по его имени.<br>
@@ -321,14 +336,14 @@ interface IFormState {
   //Конструктор:
   constructor(protected container: HTMLFormElement, protected events: IEvents);
   //Методы:
-  protected onInputChange(field: keyof T, value: string): void;  // Генерирует событие при изменении значения в поле 
+  protected onInputChange(field: keyof T, value: string): void;  // Генерирует событие при изменении значения в поле
   set valid(value: boolean): void; // Устанавливает активность кнопки отправки в зависимости от валидности формы
   set errors(value: string): void; // Устанавливает текст ошибок на форме
   render(state: Partial<T> & IFormState): HTMLFormElement; // Рендерит форму на основе переданного состояния (значения полей + валидность + ошибки)
 ```
 
 **class Order**extends Form<IOrderForm><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Представляет собой компонент формы оформления заказа в магазине Веб-Ларёк. <br>
 Наследует базовый функционал от класса Form, обрабатывая ввод данных покупателя (телефон и email), и обеспечивает их установку в соответствующие поля формы.
 
@@ -344,7 +359,7 @@ __Описание класса:__<br>
 ```
 
 **class Modal**extends Component<IModalData><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Это часть слоя VIEW (отображение).<br>
 Управляет отображением модального окна.<br>
 Оборачивает логику показа/скрытия модального окна.<br>
@@ -369,7 +384,7 @@ interface IModalData {
 ```
 
 **class Success**extends Component<ISuccess><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Это часть слоя VIEW (отображение).<br>
 Обрабатывает отображение экрана успешного действия (например, "Спасибо за заказ").<br>
 Позволяет назначить колбэк при клике по кнопке.<br>
@@ -386,11 +401,11 @@ interface ISuccessActions {
   protected _close: HTMLElement;  // Элемент-кнопка, по которой пользователь завершает работу с экраном "Успешно"
   protected events: EventEmitte;  // Объект для генерации и обраьботки событий
   //Конструктор:
-  constructor(container: HTMLElement, events% EventEmitter, actions: ISuccessActions);
+  constructor(container: HTMLElement, events: EventEmitter, actions: ISuccessActions);
 ```
 
 **class Page**extends Component<IPage><br>
-__Описание класса:__<br>
+**Описание класса:**<br>
 Управляет элементами страницы, которые отвечают за отображение данных (корзина, каталог товаров, блокировка страницы).<br>
 Использует метод событий для обработки взаимодействий с корзиной, обновляет DOM при изменении данных и предоставляет методы для изменения визуальных состояний, таких как блокировка страницы.
 
@@ -415,38 +430,39 @@ interface IPage {
 ```
 
 ### Список событий
-Событие (eventName)	{Тип данных (data)}	Описание<br>
-__1. События интерфейса (VIEW)__<br>
-ui:show	{ element: HTMLElement }	Показать элемент на странице.<br>
-ui:hide	{ element: HTMLElement }	Скрыть элемент на странице.<br>
-ui:updateText	{ element: HTMLElement, text: string }	Обновить текстовое содержимое элемента.<br>
-ui:toggleClass	{ element: HTMLElement, className: string, force?: boolean }	Переключить класс у элемента.<br>
-ui:setImage	{ element: HTMLImageElement, src: string, alt?: string }	Установить изображение с альтернативным текстом.<br>
-ui:setDisabled	{ element: HTMLElement, state: boolean }	Установить или снять блокировку с элемента.<br>
-__2. События действий пользователя (USER ACTIONS)__<br>
-user:addToCart	{ productId: string, quantity: number }	Пользователь добавил товар в корзину.<br>
-user:removeFromCart	{ productId: string }	Пользователь удалил товар из корзины.<br>
-user:checkout	{ cart: ICart }	Пользователь начал оформление заказа.<br>
-user:selectPaymentMethod	`{ paymentMethod: 'online'	'cash' }`<br>
-user:setShippingAddress	{ address: string }	Пользователь ввел адрес доставки.<br>
-user:submitOrder	{ order: IOrder }	Пользователь подтвердил заказ.<br>
-__3. События данных (MODEL)__<br>
-model:catalogUpdated	{ catalog: ILot[] }	Обновление каталога товаров.<br>
-model:cartUpdated	{ basket: string[] }	Обновление данных корзины.<br>
-model:orderCreated	{ order: IOrderResponse }	Новый заказ был успешно размещен.<br>
-model:orderFailed	{ error: string }	Произошла ошибка при оформлении заказа.<br>
-model:previewChanged	`{ preview: string	null }`<br>
-model:formErrorsChanged	{ formErrors: FormErrors }	Изменение ошибок в форме заказа.<br>
-__4. Системные события__<br>
-system:loading	{ isLoading: boolean }	Статус загрузки данных (загрузка/завершена).<br>
-system:loaded	{ data: any }	Данные успешно загружены.<br>
-system:error	{ message: string, code: number }	Произошла ошибка в приложении.<br>
-system:formValidation	{ isValid: boolean, errors: FormErrors }	Результат валидации формы заказа.<br>
-__5. События, связанные с моделью заказа (ORDER)__<br>
-order:ready	{ order: IOrder }	Заказ готов к отправке (валидация формы успешна).<br>
-order:submitted	{ order: IOrder }	Заказ был успешно отправлен.<br>
-order:clear	{}	Очистить корзину после успешной оплаты.<br>
-__6. События для компонентов (COMPONENTS)__
-component:rendered	{ component: string }	Компонент был отрисован на странице.<br>
-component:updated	{ component: string, data: any }	Компонент был обновлен с новыми данными.<br>
-component:destroyed	{ component: string }	Компонент был удален или уничтожен.<br>
+
+Событие (eventName) {Тип данных (data)} Описание<br>
+**1. События интерфейса (VIEW)**<br>
+ui:show { element: HTMLElement } Показать элемент на странице.<br>
+ui:hide { element: HTMLElement } Скрыть элемент на странице.<br>
+ui:updateText { element: HTMLElement, text: string } Обновить текстовое содержимое элемента.<br>
+ui:toggleClass { element: HTMLElement, className: string, force?: boolean } Переключить класс у элемента.<br>
+ui:setImage { element: HTMLImageElement, src: string, alt?: string } Установить изображение с альтернативным текстом.<br>
+ui:setDisabled { element: HTMLElement, state: boolean } Установить или снять блокировку с элемента.<br>
+**2. События действий пользователя (USER ACTIONS)**<br>
+user:addToCart { productId: string, quantity: number } Пользователь добавил товар в корзину.<br>
+user:removeFromCart { productId: string } Пользователь удалил товар из корзины.<br>
+user:checkout { cart: ICart } Пользователь начал оформление заказа.<br>
+user:selectPaymentMethod `{ paymentMethod: 'online'	'cash' }`<br>
+user:setShippingAddress { address: string } Пользователь ввел адрес доставки.<br>
+user:submitOrder { order: IOrder } Пользователь подтвердил заказ.<br>
+**3. События данных (MODEL)**<br>
+model:catalogUpdated { catalog: ILot[] } Обновление каталога товаров.<br>
+model:cartUpdated { basket: string[] } Обновление данных корзины.<br>
+model:orderCreated { order: IOrderResponse } Новый заказ был успешно размещен.<br>
+model:orderFailed { error: string } Произошла ошибка при оформлении заказа.<br>
+model:previewChanged `{ preview: string	null }`<br>
+model:formErrorsChanged { formErrors: FormErrors } Изменение ошибок в форме заказа.<br>
+**4. Системные события**<br>
+system:loading { isLoading: boolean } Статус загрузки данных (загрузка/завершена).<br>
+system:loaded { data: any } Данные успешно загружены.<br>
+system:error { message: string, code: number } Произошла ошибка в приложении.<br>
+system:formValidation { isValid: boolean, errors: FormErrors } Результат валидации формы заказа.<br>
+**5. События, связанные с моделью заказа (ORDER)**<br>
+order:ready { order: IOrder } Заказ готов к отправке (валидация формы успешна).<br>
+order:submitted { order: IOrder } Заказ был успешно отправлен.<br>
+order:clear {} Очистить корзину после успешной оплаты.<br>
+**6. События для компонентов (COMPONENTS)**
+component:rendered { component: string } Компонент был отрисован на странице.<br>
+component:updated { component: string, data: any } Компонент был обновлен с новыми данными.<br>
+component:destroyed { component: string } Компонент был удален или уничтожен.<br>

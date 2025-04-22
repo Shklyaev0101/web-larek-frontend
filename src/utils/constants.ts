@@ -5,7 +5,7 @@ export const CDN_URL = `${process.env.API_ORIGIN}/content/weblarek`;
 
 export const CATEGORY_CONFIG: CategoryConfig = {
 	soft: {
-		label: 'софт-скил', // или подходящий текст для категории
+		label: 'софт-скил',
 		color: '#F0F0F0', // значение цвета из $category1 в SCSS
 	},
 	hard: {
@@ -31,7 +31,7 @@ export interface IFormErrors {
 	email?: string;
 	phone?: string;
 	address?: string;
-	[key: string]: string | undefined; // Поддержка динамических ошибок
+	[key: string]: string /* | undefined*/; // Поддержка динамических ошибок
 }
 
 export const FORM_ERRORS: IFormErrors = {

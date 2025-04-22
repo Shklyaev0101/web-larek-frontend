@@ -13,10 +13,8 @@ export class Page extends Component<IPage> {
 	protected _wrapper: HTMLElement;
 	protected _basket: HTMLElement;
 
-	constructor(container: HTMLElement, events: EventEmitter) {
-		super('page'); // Предполагается, что шаблон с ID 'page' существует в HTML
-		this.container = container;
-		this.events = events;
+	constructor(container: HTMLElement, protected events: EventEmitter) {
+		super(container);
 
 		// Инициализация элементов DOM
 		this._counter = this.container.querySelector(
@@ -58,6 +56,6 @@ export class Page extends Component<IPage> {
 
 	// Вызывается для получения DOM-элемента компонента
 	render(data?: Partial<IPage>): HTMLElement {
-		return this.container;
+		return super.render(data);
 	}
 }

@@ -12,34 +12,29 @@ export class Modal extends Component<IModalData> {
 	/**
 	 * Конструктор
 	 * @param container Элемент, в котором будет отображаться модальное окно
-	 * @param events Система событий для обработки
 	 */
-	constructor(events: EventEmitter) {
-		super('modal-template'); // Вызов конструктора родительского класса с ID шаблона
-		this.events = events;
+	constructor(container: HTMLElement, protected events: EventEmitter) {
+		super(container);
 
 		// Привязываем элементы
 		this._content = this.container.querySelector(
-			'.modal-content'
+			'.modal__content'
 		) as HTMLElement;
 		if (!this._content) {
-			throw new Error('Не найдено');
+			throw new Error('Не найдено_1');
 		}
 
 		this._closeButton = this.container.querySelector(
-			'.modal-close-button'
+			'.modal__close'
 		) as HTMLButtonElement;
 		if (!this._closeButton) {
-			throw new Error('Не найдено');
+			throw new Error('Не найдено_2');
 		}
 
 		// Добавление обработчика для кнопки закрытия
 		this._closeButton.addEventListener('click', () => {
 			this.close(); // Закрыть модальное окно
 		});
-
-		// Присваиваем события
-		this.events = events;
 	}
 
 	/**
@@ -64,7 +59,7 @@ export class Modal extends Component<IModalData> {
 	 */
 	close(): void {
 		this.setHidden(this.container); // Скрываем модальное окно
-		this.content = document.createElement('div'); // Очищаем содержимое
+		this._content.innerHTML = ''; // Очищаем содержимое
 		this.events.emit('modal:close'); // Генерируем событие о том, что модальное окно закрыто
 	}
 
@@ -76,7 +71,7 @@ export class Modal extends Component<IModalData> {
 	render(data: IModalData): HTMLElement {
 		// Устанавливаем содержимое в модальное окно
 		this.content = data.content;
-		this.open(); // Открываем модальное окно
+		//this.open(); // Открываем модальное окно
 
 		return this.container; // Возвращаем обновленное модальное окно
 	}

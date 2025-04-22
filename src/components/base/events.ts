@@ -14,9 +14,9 @@ interface EventMap {
 	'state:changed': undefined;
 	'preview:changed': undefined;
 	'basket:changed': undefined;
-  'modal:open': undefined;    // событие для открытия modal
-	'modal:close': undefined;   // событие для закрытия modal
-	'basket:open': undefined;   // событие для открытия basket
+	'modal:open': undefined; // событие для открытия modal
+	'modal:close': undefined; // событие для закрытия modal
+	'basket:open': undefined; // событие для открытия basket
 	// можно добавить еще события при необходимости
 }
 
@@ -32,47 +32,84 @@ export interface IEvents {
 	): (data: EventMap[K]) => void;
 }
 
+/**
+ * Брокер событий, классическая реализация
+ * В расширенных вариантах есть возможность подписаться на все события
+ * или слушать события по шаблону например
+ */
 export class EventEmitter implements IEvents {
-	private _events = new Map<EventName, Set<Subscriber>>();
+	_events: Map<EventName, Set<Subscriber>>;
 
-	on<K extends keyof EventMap>(
-		eventName: K,
-		callback: (event: EventMap[K]) => void
-	) {
+	constructor() {
+		this._events = new Map<EventName, Set<Subscriber>>();
+	}
+
+	/**
+	 * Установить обработчик на событие
+	 */
+	on<T extends object>(eventName: EventName, callback: (event: T) => void) {
 		if (!this._events.has(eventName)) {
-			this._events.set(eventName, new Set());
+			this._events.set(eventName, new Set<Subscriber>());
 		}
-		this._events.get(eventName)!.add(callback);
+		this._events.get(eventName)?.add(callback);
 	}
 
+	/**
+	 * Снять обработчик с события
+	 */
 	off(eventName: EventName, callback: Subscriber) {
-		this._events.get(eventName)?.delete(callback);
-		if (this._events.get(eventName)?.size === 0) {
-			this._events.delete(eventName);
+		if (this._events.has(eventName)) {
+			this._events.get(eventName)!.delete(callback);
+			if (this._events.get(eventName)?.size === 0) {
+				this._events.delete(eventName);
+			}
 		}
 	}
 
-	emit<K extends keyof EventMap>(eventName: K, data?: EventMap[K]) {
-		this._events.get(eventName)?.forEach((callback) => callback(data));
+	/**
+	 * Инициировать событие с данными
+	 */
+	emit<T extends object>(eventName: string, data?: T) {
+		this._events.forEach((subscribers, name) => {
+			if (name === '*')
+				subscribers.forEach((callback) =>
+					callback({
+						eventName,
+						data,
+					})
+				);
+			if (
+				(name instanceof RegExp && name.test(eventName)) ||
+				name === eventName
+			) {
+				subscribers.forEach((callback) => callback(data));
+			}
+		});
 	}
 
-	trigger<K extends keyof EventMap>(
-		eventName: K,
-		context?: Partial<EventMap[K]>
-	) {
-		return (event: Partial<EventMap[K]> = {}) => {
+	/**
+	 * Слушать все события
+	 */
+	onAll(callback: (event: EmitterEvent) => void) {
+		this.on('*', callback);
+	}
+
+	/**
+	 * Сбросить все обработчики
+	 */
+	offAll() {
+		this._events = new Map<string, Set<Subscriber>>();
+	}
+
+	/**
+	 * Сделать коллбек триггер, генерирующий событие при вызове
+	 */
+	trigger<T extends object>(eventName: string, context?: Partial<T>) {
+		return (event: object = {}) => {
 			this.emit(eventName, {
 				...(event || {}),
 				...(context || {}),
-			} as EventMap[K]);
+			});
 		};
-	}
-
-	onAll(callback: (event: EmitterEvent) => void) {
-		throw new Error('onAll method is no longer available');
-	}
-
-	offAll() {
-		this._events.clear();
 	}
 }
