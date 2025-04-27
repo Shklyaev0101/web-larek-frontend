@@ -1,143 +1,121 @@
-import { EventEmitter } from '../base/events';
-import {
-	IAppState,
-	IProduct,
-	IProductListResponse,
-	IFormErrors,
-	IOrderForm,
-	IOrder,
-} from '../../types';
-import { CategoryConfig } from '../../types';
-import { CATEGORY_CONFIG } from '../../utils/constants';
+import { FormErrors, IAppState, IOrder, IOrderForm, IProductItem } from "../../types";
+import { Model } from "../base/model";
 
-export class AppState implements IAppState {
-	// Свойства состояния
-	basket: string[] = []; // Список товаров в корзине
-	catalog: IProduct[] = []; // Каталог товаров
-	order: IOrder = {
-		// Заказ пользователя
-		payment: 'online',
-		email: '',
-		phone: '',
-		address: '',
-		total: 0,
-		items: [],
-	};
-	preview: string | null = null; // Идентификатор товара для предварительного просмотра
-	public manualPreview: boolean = false;
-	formErrors: IFormErrors = {}; // Ошибки формы
-	categoryConfig: CategoryConfig = CATEGORY_CONFIG; // Добавляем категорию из CATEGORY_CONFIG
+export class AppData extends Model<IAppState> {
+  catalog: Product[];
+  preview: string;
+  basket: Product[] = [];
+  order: IOrder = {
+    address: '',
+    payment: 'card',
+    email: '',
+    total: 0,
+    phone: '',
+    items: []
+  };
+  formErrors: FormErrors = {};
 
-	private events: EventEmitter; // Экземпляр EventEmitter для обработки событий
+  clearBasket() {
+    this.basket = []
+    this.order.items = []
+  }
 
-	constructor(events: EventEmitter) {
-		this.events = events; // Инициализация с передачей экземпляра EventEmitter
+  addToOrder(item: Product) {
+    this.order.items.push(item.id)
+  }
+  
+  removeFromOrder(item: Product) {
+    const index = this.order.items.indexOf(item.id);
+    if (index >= 0) {
+      this.order.items.splice( index, 1 );
+    }
+  }
 
-		// Подписка на события из внешней точки входа
-		events.on('state:changed', () => this.updateCatalog());
-		events.on('preview:changed', () => this.updatePreview());
-		events.on('basket:changed', () => this.updateBasket());
-	}
+  setCatalog(items: IProductItem[]) {
+    this.catalog = items.map(item => new Product(item, this.events));
+    this.emitChanges('items:changed', { catalog: this.catalog });
+  }
 
-	// Метод для получения категории по ключу
-	getCategoryConfig(
-		categoryKey: string
-	): CategoryConfig[keyof CategoryConfig] | undefined {
-		return this.categoryConfig[categoryKey];
-	}
+  setPreview(item: Product) {
+    this.preview = item.id;
+    this.emitChanges('preview:changed', item);
+  }
 
-	// Добавление или удаление товара из корзины
-	toggleOrderedLot(id: string, isIncluded: boolean): void {
-		if (isIncluded) {
-			this.basket.push(id);
-		} else {
-			this.basket = this.basket.filter((item) => item !== id);
-		}
-		// Триггерим событие обновления корзины
-		this.emitStateChanged();
-	}
+  setProductToBasket(item: Product) {
+    this.basket.push(item)
+  }
 
-	// Очистка корзины
-	clearBasket(): void {
-		this.basket = [];
-		this.emitStateChanged();
-	}
+  removeProductToBasket(item: Product) {
+    const index = this.basket.indexOf(item);
+    if (index >= 0) {
+      this.basket.splice( index, 1 );
+    }
+  }
 
-	// Вычисление общей стоимости заказа
-	getTotal(): number {
-		return this.catalog
-			.filter((item) => this.basket.includes(item.id)) // Фильтруем товары в корзине
-			.reduce((total, item) => total + (item.price || 0), 0); // Суммируем цены товаров в корзине
-	}
+  get statusBasket(): boolean {
+    return this.basket.length === 0
+  }
+  
+  get bskt(): Product[] {
+    return this.basket
+  }
 
-	// Установка каталога товаров
-	setCatalog(items: IProduct[]): void {
-		this.catalog = items;
-		this.emitStateChanged();
-	}
+  set total(value: number) {
+    this.order.total = value;
+  }
 
-	// Установка товара для предварительного просмотра
-	setPreview(item: IProduct, manual: boolean = true): void {
-		console.log('setPreview called', item.title, 'manual:', manual);
-		this.preview = item.id;
-		this.manualPreview = manual;
+  getTotal() {
+    return this.order.items.reduce((a, c) => a + this.catalog.find(it => it.id === c).price, 0)
+  }
 
-		this.events.emit('preview:changed');
-	}
+  setOrderField(field: keyof IOrderForm, value: string) {
+    this.order[field] = value;
 
-	// Установка значения поля заказа
-	setOrderField(field: keyof IOrderForm, value: string): void {
-		if (field === 'payment' && (value === 'online' || value === 'cash')) {
-			this.order[field] = value;
-		} else {
-			// Тут можно обработать ошибку или оставить как есть
-			console.error('Неверное обозначение способа оплаты');
-		}
-	}
+    if (this.validateOrder()) {
+        this.events.emit('order:ready', this.order);
+    } 
+  }
+  setContactsField(field: keyof IOrderForm, value: string) {
+    this.order[field] = value;
 
-	// Валидация формы заказа
-	validateOrder(): boolean {
-		const { email, phone, address } = this.order; /*as IOrder*/
-		const errors: IFormErrors = {};
+    if (this.validateContacts()) {
+        this.events.emit('order:ready', this.order);
+    } 
+  }
 
-		// Валидация полей
-		if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-			errors.email = 'Неверный формат Email';
-		}
+  validateOrder() {
+      const errors: typeof this.formErrors = {};
+      
+      if (!this.order.address) {
+        errors.address = 'Необходимо указать адресс';
+      }
+      this.formErrors = errors;
+      this.events.emit('formErrors:change', this.formErrors);
+      return Object.keys(errors).length === 0;
+  }
 
-		if (!phone || !/^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/.test(phone)) {
-			errors.phone = 'Неверный формат телефона';
-		}
+  validateContacts() {
+      const errors: typeof this.formErrors = {};
+      if (!this.order.email) {
+          errors.email = 'Необходимо указать email';
+      }
+      if (!this.order.phone) {
+          errors.phone = 'Необходимо указать телефон';
+      }
+      
+      this.formErrors = errors;
+      this.events.emit('formErrors:change', this.formErrors);
+      return Object.keys(errors).length === 0;
+  }
 
-		if (!address) {
-			errors.address = 'Адрес доставки не указан';
-		}
+}
 
-		this.formErrors = errors;
-		return Object.keys(errors).length === 0; // Если ошибок нет, возвращаем true
-	}
 
-	// Обновление каталога (вызывается при изменении состояния)
-	private updateCatalog(): void {
-		// Обновление каталога товаров
-		console.log('Каталог с товарами обновлен');
-	}
-
-	// Обновление предпросмотра товара
-	private updatePreview(): void {
-		const product = this.catalog.find((p) => p.id === this.preview);
-		if (product) {
-			console.log(`Предварительный просмотр установлен на: ${product.title}`);
-		}
-	}
-
-	// Обновление корзины
-	private updateBasket(): void {
-		console.log(`Корзина обновлена: ${this.basket.length} товаром`);
-	}
-
-	// Триггер для обновления состояния
-	private emitStateChanged(): void {
-		this.events.emit('state:changed');
-	}
+export class Product extends Model<IProductItem> {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  image: string;
+  price: number | null;
 }

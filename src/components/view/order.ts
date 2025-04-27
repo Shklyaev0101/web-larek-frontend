@@ -1,49 +1,46 @@
-import { EventEmitter } from '../base/events';
-import { Form } from './form';
+import { IOrderForm } from "../../types";
+import { ensureAllElements } from "../../utils/utils";
+import { IEvents } from "../base/events";
+import { Form } from "./form";
 
-interface IOrderForm {
-	phone: string;
-	email: string;
-}
 
 export class Order extends Form<IOrderForm> {
-	private phoneInput: HTMLInputElement;
-	private emailInput: HTMLInputElement;
+  protected _buttons: HTMLButtonElement[];
 
-	constructor(container: HTMLFormElement, events: EventEmitter) {
-		super(container, events);
+  constructor(container: HTMLFormElement, events: IEvents) {
+      super(container, events);
 
-		this.phoneInput = this.container.querySelector<HTMLInputElement>(
-			'input[name="phone"]'
-		);
-		this.emailInput = this.container.querySelector<HTMLInputElement>(
-			'input[name="email"]'
-		);
+      this._buttons = ensureAllElements<HTMLButtonElement>('.button_alt', container);
 
-		// Обработка отправки формы
-		this.container.addEventListener('submit', (e: Event) => {
-			e.preventDefault();
-			this.events.emit('form:submit');
-		});
-	}
-	/**
-	 * Устанавливает значение поля телефона
-	 */
-	set phone(value: string) {
-		this.updateFieldValue('phone', value);
-	}
+      this._buttons.forEach(button => {
+          button.addEventListener('click', () => {
+            this.payment = button.name; 
+            events.emit('payment:change', button)
+          });
+      })
+      
+  }
 
-	set email(value: string) {
-		this.updateFieldValue('email', value);
-	}
-	/**
-	 * Устанавливает значение поля email
-	 */
-	private updateFieldValue(fieldName: keyof IOrderForm, value: string) {
-		if (fieldName === 'phone' && this.phoneInput) {
-			this.phoneInput.value = value;
-		} else if (fieldName === 'email' && this.emailInput) {
-			this.emailInput.value = value;
-		}
-	}
+  set payment(name: string) {
+    this._buttons.forEach(button => {
+      this.toggleClass(button, 'button_alt-active', button.name === name);
+    });
+  }
+
+  set address(value: string) {
+    (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
+  }
+
+}
+
+export class Сontacts extends Form<IOrderForm> {
+  constructor(container: HTMLFormElement, events: IEvents) {
+    super(container, events);
+  }
+  set phone(value: string) {
+    (this.container.elements.namedItem('phone') as HTMLInputElement).value = value;
+  }
+  set email(value: string) {
+    (this.container.elements.namedItem('email') as HTMLInputElement).value = value;
+  }
 }

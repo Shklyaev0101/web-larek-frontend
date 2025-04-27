@@ -1,177 +1,134 @@
-import { Component } from '../base/component';
-import { EventEmitter } from '../base/events';
-import { CategoryConfig } from '../../types'; //новое
+import { ensureElement } from "../../utils/utils";
+import { Component } from "../base/component";
 
-interface ICard<T> {
-	category: string; //новое
+
+
+interface ICardActions {
+	onClick: (event: MouseEvent) => void;
+  }
+  
+  interface ICard {
 	title: string;
-	description?: string | string[];
+	category: string;
 	image: string;
 	price: number;
-	status: T;
-}
-
-export class Card<T> extends Component<ICard<T>> {
-	private categoryConfig: CategoryConfig; //новое
-	protected _category: HTMLElement; //новое
+	text: string;
+  }
+  
+  export class Card<T> extends Component<ICard> {
 	protected _title: HTMLElement;
-	protected _image?: HTMLImageElement;
-	protected _description?: HTMLElement;
+	protected _category: HTMLElement;
+	protected _image: HTMLImageElement;
 	protected _price: HTMLElement;
-	protected _button?: HTMLButtonElement;
-	private _data?: ICard<T>; // данные карточки
-
-	/**
-	 * Конструктор класса
-	 */
-	constructor(
-		container: HTMLElement,
-		protected events: EventEmitter,
-		actions?: { buttonText: string; onClick: () => void },
-		cardData?: ICard<T>, // -> карточка
-		categoryConfig?: CategoryConfig //новое
-	) {
-		super(container);
-
-		this._data = cardData; // -> карточка
-		this.categoryConfig = categoryConfig || {}; //новое
-
-		// Инициализация элементов DOM
-		this._title = this.container.querySelector('.card__title') as HTMLElement;
-		if (!this._title)
-			throw new Error('Элемент .card__title не найден в template');
-		this._price = this.container.querySelector('.card__price') as HTMLElement;
-		if (!this._price)
-			throw new Error('Элемент .card__price не найден в template');
-		this._image = this.container.querySelector(
-			'.card__image'
-		) as HTMLImageElement;
-		this._button = this.container.querySelector(
-			'.card__button'
-		) as HTMLButtonElement;
-		this._category = this.container.querySelector(
-			'.card__category'
-		) as HTMLElement;
-		if (!this._category) throw new Error('Элемент .card__category не найден');
-
-		// Обработка кнопки
-		if (this._button) {
-			this._button.textContent = actions?.buttonText ?? 'Кнопка';
-			this._button.addEventListener('click', (e) => {
-				e.stopPropagation(); // Не даём всплывать до карточки
-				actions?.onClick?.();
-			});
-		}
-		// Обработка клика по карточке
-		this.container.style.cursor = 'pointer';
-		this.container.addEventListener('click', () => {
-			if (this._data) {
-				this.events.emit('card:clicked', this._data);
-			} else {
-				console.warn('Нет данных по карточке при клике');
-			}
-		});
+	protected _categoryColor = <Record<string, string>> {
+	  "софт-скил": "soft",
+	  "другое": "other",
+	  "дополнительное": "additional",
+	  "кнопка": "button",
+	  "хард-скил": "hard"
 	}
-
-	// Устанавливаем категорию с использованием CategoryConfig /НОВОЕ
-	set category(value: string) {
-		const categoryInfo = this.categoryConfig[value];
-
-		console.log(
-			`Используемая категория: ${value}, класс: card__category_${value}`
-		);
-
-		if (categoryInfo) {
-			// Устанавливаем текст категории
-			this.setText(this._category, categoryInfo.label);
-
-			this._category.style.backgroundColor = categoryInfo.color;
-			console.log(`Используемый цвет фона категории: ${categoryInfo.color}`);
-
-			// Удаляем все возможные классы для фона
-			this._category.classList.remove(
-				'card__category_soft',
-				'card__category_other'
-			);
-
-			/*
-			// Добавляем соответствующий класс для цвета фона
-			this._category.classList.add(`card__category_${value}`);
-
-			this._category.style.setProperty('background-color', categoryInfo.color);
-			*/
-		} else {
-			// Если категории нет в config, просто выводим текст
-			this.setText(this._category, value);
-		}
+  
+	constructor(container: HTMLElement, actions?: ICardActions) {
+	  super(container);
+	  this._title = ensureElement<HTMLElement>(`.card__title`, container);
+	  this._category = ensureElement<HTMLElement>(`.card__category`, container);
+	  this._image = ensureElement<HTMLImageElement>(`.card__image`, container);
+	  this._price = ensureElement<HTMLElement>(`.card__price`, container);
+  
+  
+	  if (actions?.onClick) {
+		  container.addEventListener('click', actions.onClick);
+	  }
 	}
-
-	/**
-	 * Устанавливает заголовок товара
-	 */
+  
 	set title(value: string) {
-		this.setText(this._title, value);
+	  this.setText(this._title, value);
 	}
-
-	/**
-	 * Получение заголовка товара
-	 */
-	get title(): string {
-		return this._title.textContent || '';
+  
+	set category(value: string) {
+	  this.setText(this._category, value);
+	  this._category.className = `card__category card__category_${this._categoryColor[value]}`
 	}
-
-	/**
-	 * Устанавливает изображение товара
-	 */
+  
 	set image(value: string) {
-		if (this._image) {
-			this.setImage(this._image, value, this.title); // Используем метод setImage базового компонента
-		}
+	  this.setImage(this._image, value, this.title);
 	}
-
-	/**
-	 * Устанавливает описание товара (может быть строкой или массивом строк)
-	 */
-	set description(value: string | string[]) {
-		this.setText(
-			this._description,
-			Array.isArray(value) ? value.join(' ') : value
-		);
-	}
-
-	/**
-	 * Устанавливает цену товара
-	 */
-	set price(value: number) {
+  
+	set price(value: string) {
+	  if(value === null) {
+		this.setText(this._price, `Бесценно`);
+	  } else {
 		this.setText(this._price, `${value} синапсов`);
-		if (value === 0) {
-			this.setText(this._price, `Бесценно`);
-		}
+	  }
 	}
-	/**
-	 * Устанавливает статус товара
-	 */
-	set status(value: T) {
+  }
+  
+  interface ICardPreview {
+	text: string;
+  }
+  
+  export class CardPreview extends Card<ICardPreview> {
+	protected _text: HTMLElement;
+	protected _button: HTMLElement;
+	
+	constructor(container: HTMLElement, actions?: ICardActions) {
+	  super(container, actions)
+	  this._button = container.querySelector(`.card__button`);
+	  this._text = ensureElement<HTMLElement>(`.card__text`, container);
+  
+	  if (actions?.onClick) {
 		if (this._button) {
-			if (value === 'available') {
-				this.setDisabled(this._button, false);
-				this._button.textContent = 'Добавлен в корзину';
-			} else if (value === 'out of stock') {
-				this.setDisabled(this._button, true);
-				this._button.textContent = 'Нет в наличии';
-			}
-		}
+			container.removeEventListener('click', actions.onClick);
+			this._button.addEventListener('click', actions.onClick);
+		} 
+	  }
 	}
-
-	/**
-	 * Обновляет данные карточки товара
-	 */
-	updateCard(cardData: ICard<T>) {
-		this.category = cardData.category;
-		this.title = cardData.title;
-		this.image = cardData.image;
-		this.description = cardData.description || 'Описание отсутствует';
-		this.price = cardData.price;
-		this.status = cardData.status;
+  
+	set text(value: string) {
+	  this.setText(this._text, value);
 	}
-}
+  }
+  
+  interface ICardBasket {
+	title: string;
+	price: number;
+	index: number;
+  }
+  
+  export class CardBasket extends Component<ICardBasket> {
+	protected _title: HTMLElement;
+	protected _price: HTMLElement;
+	protected _button: HTMLElement;
+	protected _index: HTMLElement;
+	
+	constructor(container: HTMLElement, actions?: ICardActions) {
+	  super(container);
+	  this._title = ensureElement<HTMLElement>(`.card__title`, container);
+	  this._price = ensureElement<HTMLElement>(`.card__price`, container);
+	  this._index = ensureElement<HTMLElement>(`.basket__item-index`, container);
+	  this._button = container.querySelector(`.card__button`);
+  
+	  if (actions?.onClick) {
+		if (this._button) {
+			container.removeEventListener('click', actions.onClick);
+			this._button.addEventListener('click', actions.onClick);
+		} 
+	  }
+	}
+  
+	set index(value: number) {
+	  this.setText(this._index, value);
+	}
+  
+	set title(value: string) {
+	  this.setText(this._title, value);
+	}
+  
+	set price(value: string) {
+	  if(value === null) {
+		this.setText(this._price, `Бесценно`);
+	  } else {
+		this.setText(this._price, `${value} синапсов`);
+	  }
+	}
+  }

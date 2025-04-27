@@ -1,59 +1,42 @@
-// Типы для каждого элемента
-
-// Тип для объекта, который храненит данные, соответствующие категориям товаров
-export type CategoryConfig = {
-	[key: string]: {
-		// Строка - одна из категорий
-		label: string; // Текстовое описание категории
-		color: string; // Цвет фона для категории
-	};
-};
-
-// Тип для состояния приложения
-export type IAppState = {
-	basket: string[]; // Массив ID товаров в корзине
-	catalog: IProduct[]; //IProductListResponse[]; // Массив товаров в каталоге
-	order: IOrder; // Заказ пользователя
-	preview: string | null; // Предварительный просмотр товара
-	formErrors: IFormErrors; // Ошибки формы
-};
-
-// Тип для товара
-export type IProduct = {
+export interface IProductItem {
 	id: string;
-	description: string;
-	image: string;
 	title: string;
+	description: string;
 	category: string;
+	image: string;
 	price: number | null;
-	status: 'available' | 'out of stock';
-};
-
-// Тип для ответа на запрос списка продуктов,
-// который включает общее количество товаров и массив товаров
-export type IProductListResponse = {
-	total: number;
-	items: IProduct[];
-};
-
-// Тип для тела запроса на создание заказа
-export type IOrder = {
-	payment: 'online' | 'cash';
-	email: string;
-	phone: string;
-	address: string;
-	total: number;
-	items: string[]; // Массив id продуктов
-};
-
-// Тип для ответа на запрос создания заказа
-export type IOrderResult = {
+  }
+  
+  export interface IAppState {
+	catalog: IProductItem[];
+	preview: string;
+	basket: string[];
+	order: IOrder;
+	total: string | number;
+	loading: boolean;
+  }
+  
+  
+  export interface IProductsList {
+	products: IProductItem[];
+  }
+  
+  
+  export interface IOrderForm {
+	payment?: string;
+	address?: string;
+	phone?: string;
+	email?: string;
+	total?: string | number;
+  }
+  
+  export interface IOrder extends IOrderForm {
+	items: string[];
+  }
+  
+  
+  export type FormErrors = Partial<Record<keyof IOrder, string>>;
+  
+  export interface IOrderResult {
 	id: string;
-	total: number;
-};
-
-// Тип данных формы (без total и items)
-export type IOrderForm = Omit<IOrder, 'total' | 'items'>;
-
-// Тип ошибок формы
-export type IFormErrors = Partial<Record<keyof IOrderForm, string>>;
+  }

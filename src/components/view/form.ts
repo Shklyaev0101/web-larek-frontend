@@ -1,85 +1,55 @@
-import { IOrderForm } from '../../types';
-import { Component } from '../base/component';
-import { EventEmitter } from '../base/events';
+import { ensureElement } from "../../utils/utils";
+import { Component } from "../base/component";
+import { IEvents } from "../base/events";
 
 interface IFormState {
-	valid: boolean;
-	errors: string[];
+  valid: boolean;
+  errors: string[];
 }
 
-export class Form<T extends Record<string, any>> extends Component<IFormState> {
-	// DOM элементы для формы
-	protected _submit: HTMLButtonElement; // Кнопка отправки
-	protected _errors: HTMLElement; // Элемент для отображения ошибок
-	protected _fields: Partial<Record<keyof T, HTMLInputElement>> = {};
+export class Form<T> extends Component<IFormState> {
+  protected _submit: HTMLButtonElement;
+  protected _errors: HTMLElement;
 
-	constructor(container: HTMLFormElement, protected events: EventEmitter) {
-		super(container);
+  constructor(protected container: HTMLFormElement, protected events: IEvents) {
+      super(container);
 
-		// Привязываем необходимые элементы DOM
-		this._submit = container.querySelector(
-			'.submit-button'
-		) as HTMLButtonElement;
-		this._errors = container.querySelector('.form-errors') as HTMLElement;
+      this._submit = ensureElement<HTMLButtonElement>('button[type=submit]', this.container);
+      this._errors = ensureElement<HTMLElement>('.form__errors', this.container);
 
-		const inputs = container.querySelectorAll<HTMLInputElement>('input[name]');
-		inputs.forEach((input) => {
-			const name = input.name as keyof T;
-			this._fields[name] = input;
-		});
+      this.container.addEventListener('input', (e: Event) => {
+          const target = e.target as HTMLInputElement;
+          const field = target.name as keyof T;
+          const value = target.value;
+          this.onInputChange(field, value);
+      });
 
-		// Слушаем изменения в форме
-		this.container.addEventListener('input', (event) => {
-			const target = event.target as HTMLInputElement;
-			if (target.name) {
-				this.onInputChange(target.name as keyof IOrderForm, target.value);
-				this.errors = ''; // Очищаем ошибки при изменении полей
-			}
-		});
-	}
+      this.container.addEventListener('submit', (e: Event) => {
+          e.preventDefault();
+          this.events.emit(`${this.container.name}:submit`);
+      });
+  }
 
-	/**
-	 * Генерирует событие при изменении значения в поле
-	 * @param field Имя поля
-	 * @param value Значение поля
-	 */
-	protected onInputChange(field: keyof IOrderForm, value: string): void {
-		this.events.emit(`form:change`, { field, value });
-	}
+  protected onInputChange(field: keyof T, value: string) {
+      this.events.emit(`${this.container.name}.${String(field)}:change`, {
+          field,
+          value
+      });
+  }
 
-	/**
-	 * Устанавливает активность кнопки отправки в зависимости от валидности формы
-	 * @param value Валидность формы
-	 */
-	set valid(value: boolean) {
-		this.setDisabled(this._submit, !value); // Если форма не валидна, кнопка отправки будет заблокирована
-	}
+  set valid(value: boolean) {
+      this._submit.disabled = !value;
+  }
 
-	/**
-	 * Устанавливает текст ошибок на форме
-	 * @param value Ошибки валидации
-	 */
-	set errors(value: string) {
-		this.setText(this._errors, value); // Выводим ошибки на форму
-	}
+  set errors(value: string) {
+      this.setText(this._errors, value);
+  }
 
-	/**
-	 * Рендерит форму на основе переданного состояния
-	 * @param state Состояние формы (значения полей, валидность и ошибки)
-	 */
-	render(state: Partial<T> & IFormState): HTMLFormElement {
-		// Для каждого поля из состояния устанавливаем соответствующие значения
-		Object.entries(state).forEach(([key, value]) => {
-			const typedKey = key as keyof T;
-			if (this._fields[typedKey]) {
-				this._fields[typedKey]!.value = String(value ?? '');
-			}
-		});
+  render(state: Partial<T> & IFormState) {
+      const {valid, errors, ...inputs} = state;
+      super.render({valid, errors});
+      Object.assign(this, inputs);
+      return this.container;
 
-		// Обновляем состояние кнопки отправки и ошибок
-		this.valid = state.valid ?? true; // Если valid не передано, то по умолчанию форма валидна
-		this.errors = state.errors?.join(', ') ?? ''; // Если ошибок нет, то не выводим ничего
-
-		return this.container as HTMLFormElement;
-	}
+  }
 }

@@ -1,38 +1,30 @@
-import { Component } from '../base/component';
+import { ensureElement } from "../../utils/utils";
+import { Component } from "../base/component";
 
-export interface ISuccessActions {
-	onClick: () => void;
+interface ISuccess {
+  total: number;
 }
 
-export interface ISuccess {
-	total: number;
+interface ISuccessActions {
+  onClick: () => void;
 }
 
 export class Success extends Component<ISuccess> {
-	private _close: HTMLButtonElement;
-	private _description: HTMLElement;
-	private actions: ISuccessActions;
+  protected _total: HTMLElement;
+  protected _close: HTMLElement;
 
-	constructor(container: HTMLElement, actions: ISuccessActions) {
-		super(container);
-		this.actions = actions;
+  constructor(container: HTMLElement, actions: ISuccessActions) {
+      super(container);
 
-		this._close = this.container.querySelector(
-			'.order-success__close'
-		) as HTMLButtonElement;
-		this._description = this.container.querySelector(
-			'.order-success__description'
-		) as HTMLElement;
+      this._close = ensureElement<HTMLElement>('.order-success__close', this.container);
+      this._total = ensureElement<HTMLElement>('.order-success__description', this.container)
 
-		if (this._close) {
-			this._close.addEventListener('click', () => {
-				this.actions.onClick();
-			});
-		}
-	}
+      if (actions?.onClick) {
+          this._close.addEventListener('click', actions.onClick);
+      }
+  }
 
-	override render(data: ISuccess): HTMLElement {
-		this.setText(this._description, `Списано ${data.total} синапсов`);
-		return this.container;
-	}
+  set total(value: string) {
+    this._total.textContent = `Списано ${value} синапсов`;
+  }
 }
