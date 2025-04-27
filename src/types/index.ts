@@ -26,6 +26,7 @@ export type IProduct = {
 	title: string;
 	category: string;
 	price: number | null;
+	status: 'available' | 'out of stock';
 };
 
 // Тип для ответа на запрос списка продуктов,

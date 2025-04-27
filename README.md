@@ -108,8 +108,7 @@ type FormErrors = Partial<Record<keyof FormData, string>>;
 
 - Component,
 - EventEmitter,
-- Api,
-- WebLarekApi.
+- Api.
 
 **Model (Модель)**
 
@@ -125,6 +124,10 @@ type FormErrors = Partial<Record<keyof FormData, string>>;
 - Modal,
 - Success,
 - Page.
+
+**Services (Сервисы)**
+
+- WebLarekApi.
 
 **Presenter (Презентер)**
 
@@ -190,7 +193,7 @@ interface IEvents {
 **Описание класса:**<br>
 Выполняет HTTP- запросы к API.
 Устанавливает общие заголовки и параметры запроса.
-Выполняет централизованную обработку успешных и шибочных ответов.
+Выполняет централизованную обработку успешных и ошибочных ответов.
 
 ```TypeScript
     //Свойства:

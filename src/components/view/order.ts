@@ -7,8 +7,18 @@ interface IOrderForm {
 }
 
 export class Order extends Form<IOrderForm> {
+	private phoneInput: HTMLInputElement;
+	private emailInput: HTMLInputElement;
+
 	constructor(container: HTMLFormElement, events: EventEmitter) {
 		super(container, events);
+
+		this.phoneInput = this.container.querySelector<HTMLInputElement>(
+			'input[name="phone"]'
+		);
+		this.emailInput = this.container.querySelector<HTMLInputElement>(
+			'input[name="email"]'
+		);
 
 		// Обработка отправки формы
 		this.container.addEventListener('submit', (e: Event) => {
@@ -16,7 +26,6 @@ export class Order extends Form<IOrderForm> {
 			this.events.emit('form:submit');
 		});
 	}
-
 	/**
 	 * Устанавливает значение поля телефона
 	 */
@@ -27,16 +36,14 @@ export class Order extends Form<IOrderForm> {
 	set email(value: string) {
 		this.updateFieldValue('email', value);
 	}
-
 	/**
 	 * Устанавливает значение поля email
 	 */
 	private updateFieldValue(fieldName: keyof IOrderForm, value: string) {
-		const input = this.container.querySelector<HTMLInputElement>(
-			`input[name="${fieldName}"]`
-		);
-		if (input) {
-			input.value = value;
+		if (fieldName === 'phone' && this.phoneInput) {
+			this.phoneInput.value = value;
+		} else if (fieldName === 'email' && this.emailInput) {
+			this.emailInput.value = value;
 		}
 	}
 }

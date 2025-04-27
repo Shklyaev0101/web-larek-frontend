@@ -34,6 +34,7 @@ export function ensureElement<T extends HTMLElement>(
 	selectorElement: SelectorElement<T>,
 	context?: HTMLElement
 ): T {
+	console.log('Ищем элемент с селектором:', selectorElement);
 	if (isSelector(selectorElement)) {
 		const elements = ensureAllElements<T>(selectorElement, context);
 		if (elements.length > 1) {
@@ -47,13 +48,14 @@ export function ensureElement<T extends HTMLElement>(
 	if (selectorElement instanceof HTMLElement) {
 		return selectorElement as T;
 	}
-	throw new Error('Unknown selector element');
+	throw new Error('Неизвестный селектор элемента');
 }
 
 export function cloneTemplate<T extends HTMLElement>(
 	query: string | HTMLTemplateElement
 ): T {
 	const template = ensureElement(query) as HTMLTemplateElement;
+	console.log('Клонируем шаблон:', template);
 	return template.content.firstElementChild.cloneNode(true) as T;
 }
 

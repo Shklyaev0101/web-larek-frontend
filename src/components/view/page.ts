@@ -37,11 +37,7 @@ export class Page extends Component<IPage> {
 	// Обновление счётчика товаров в корзине
 	set counter(value: number) {
 		this.setText(this._counter, value); // Обновляем текст счётчика
-		this.toggleClass(
-			this._counter,
-			'header__basket-counter--visible',
-			value > 0
-		); // Показать или скрыть счётчик
+		this.toggleClass(this._counter, 'header__basket-counter', value > 0); // Показать или скрыть счётчик
 	}
 
 	// Обновление отображаемых товаров на странице

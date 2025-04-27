@@ -1,5 +1,4 @@
 import { EventEmitter } from './events';
-
 /**
  * Базовый компонент
  */

@@ -37,6 +37,16 @@ export class Modal extends Component<IModalData> {
 		});
 	}
 
+	setVisible(element: HTMLElement) {
+		console.log('Сделать модалку видимой'); // Логируем перед изменением видимости
+		element.classList.add('modal_active');
+	}
+
+	setHidden(element: HTMLElement) {
+		console.log('Скрыть модалку'); // Логируем перед изменением видимости
+		element.classList.remove('modal_active');
+	}
+
 	/**
 	 * Устанавливает содержимое модального окна.
 	 * @param value Содержимое для модального окна
@@ -50,6 +60,7 @@ export class Modal extends Component<IModalData> {
 	 * Открывает модальное окно: делает его видимым и сообщает об этом через событие.
 	 */
 	open(): void {
+		console.log('Открытие модального окна');
 		this.setVisible(this.container); // Показываем модальное окно
 		this.events.emit('modal:open'); // Генерируем событие о том, что модальное окно открыто
 	}
@@ -71,7 +82,7 @@ export class Modal extends Component<IModalData> {
 	render(data: IModalData): HTMLElement {
 		// Устанавливаем содержимое в модальное окно
 		this.content = data.content;
-		//this.open(); // Открываем модальное окно
+		this.open(); // Открываем модальное окно
 
 		return this.container; // Возвращаем обновленное модальное окно
 	}

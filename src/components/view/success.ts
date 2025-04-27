@@ -32,7 +32,7 @@ export class Success extends Component<ISuccess> {
 	}
 
 	override render(data: ISuccess): HTMLElement {
-		this.setText(this._description, `Списано ${data.total} `);
+		this.setText(this._description, `Списано ${data.total} синапсов`);
 		return this.container;
 	}
 }

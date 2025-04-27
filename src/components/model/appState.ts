@@ -15,14 +15,16 @@ export class AppState implements IAppState {
 	basket: string[] = []; // Список товаров в корзине
 	catalog: IProduct[] = []; // Каталог товаров
 	order: IOrder = {
+		// Заказ пользователя
 		payment: 'online',
 		email: '',
 		phone: '',
 		address: '',
 		total: 0,
 		items: [],
-	}; // Заказ пользователя
+	};
 	preview: string | null = null; // Идентификатор товара для предварительного просмотра
+	public manualPreview: boolean = false;
 	formErrors: IFormErrors = {}; // Ошибки формы
 	categoryConfig: CategoryConfig = CATEGORY_CONFIG; // Добавляем категорию из CATEGORY_CONFIG
 
@@ -51,7 +53,6 @@ export class AppState implements IAppState {
 		} else {
 			this.basket = this.basket.filter((item) => item !== id);
 		}
-
 		// Триггерим событие обновления корзины
 		this.emitStateChanged();
 	}
@@ -76,9 +77,12 @@ export class AppState implements IAppState {
 	}
 
 	// Установка товара для предварительного просмотра
-	setPreview(item: IProduct): void {
+	setPreview(item: IProduct, manual: boolean = true): void {
+		console.log('setPreview called', item.title, 'manual:', manual);
 		this.preview = item.id;
-		this.emitStateChanged();
+		this.manualPreview = manual;
+
+		this.events.emit('preview:changed');
 	}
 
 	// Установка значения поля заказа
@@ -116,20 +120,20 @@ export class AppState implements IAppState {
 	// Обновление каталога (вызывается при изменении состояния)
 	private updateCatalog(): void {
 		// Обновление каталога товаров
-		console.log('Catalog has been updated!');
+		console.log('Каталог с товарами обновлен');
 	}
 
 	// Обновление предпросмотра товара
 	private updatePreview(): void {
 		const product = this.catalog.find((p) => p.id === this.preview);
 		if (product) {
-			console.log(`Preview set to: ${product.title}`);
+			console.log(`Предварительный просмотр установлен на: ${product.title}`);
 		}
 	}
 
 	// Обновление корзины
 	private updateBasket(): void {
-		console.log(`Basket updated: ${this.basket.length} items`);
+		console.log(`Корзина обновлена: ${this.basket.length} товаром`);
 	}
 
 	// Триггер для обновления состояния
